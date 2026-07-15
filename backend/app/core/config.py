@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
     GEMINI_API_KEY: str = ""
+    # Comma-separated list of allowed origins — set in Render env vars
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
     @property

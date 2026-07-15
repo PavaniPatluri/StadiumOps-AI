@@ -1,7 +1,20 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 from app.core.config import settings
 from app.api.routes import auth, dashboard, incidents, zones, parking, foodcourt, tournament, volunteers, chatbot, notifications
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Auto-seed database on startup (safe to run multiple times)
+    try:
+        from app.db.seed import run_seed
+        run_seed()
+    except Exception as e:
+        print(f"Startup seed warning: {e}")
+    yield
+
 
 app = FastAPI(
     title="StadiumOps AI",
@@ -9,11 +22,13 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

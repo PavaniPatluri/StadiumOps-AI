@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: stadiumops-ai-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app/db/seed.py; uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: stadiumops-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "1440"
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: https://stadiumops-ai.vercel.app,http://localhost:5173
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+
+databases:
+  - name: stadiumops-db
+    databaseName: stadiumops
+    user: stadiumops
+    plan: free

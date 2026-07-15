@@ -246,7 +246,19 @@ def seed_notifications(db: Session):
 
 
 def run_seed():
-    create_tables()
+    import time
+    # Retry loop for cloud DBs that may not be ready immediately
+    for attempt in range(10):
+        try:
+            create_tables()
+            break
+        except Exception as e:
+            print(f"DB not ready (attempt {attempt + 1}/10): {e}")
+            time.sleep(3)
+    else:
+        print("❌ Could not connect to database after 10 attempts. Exiting.")
+        return
+
     db = SessionLocal()
     try:
         print("Seeding users...")
@@ -266,6 +278,8 @@ def run_seed():
         print("Seeding notifications...")
         seed_notifications(db)
         print("✅ Database seeded successfully!")
+    except Exception as e:
+        print(f"⚠️  Seed warning (non-fatal): {e}")
     finally:
         db.close()
 

@@ -12,14 +12,16 @@ build/
 venv/
 env/
 .venv/
-.env
-*.env
+# Backend .env has secrets — never commit
+backend/.env
 
 # Node / Frontend
 frontend/node_modules/
 frontend/dist/
 frontend/.vite/
 frontend/coverage/
+# Frontend .env.local has local overrides — never commit
+frontend/.env.local
 
 # Logs
 *.log
